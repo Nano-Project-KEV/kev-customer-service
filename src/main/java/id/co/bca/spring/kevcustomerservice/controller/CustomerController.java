@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/customer")
@@ -85,4 +86,25 @@ public class CustomerController {
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @PutMapping("/password/{id}")
+    public ResponseEntity<BaseResponse<Customer>> updatePasswordCustomerById(@PathVariable String id, @RequestBody Map<String,String> password) {
+        Customer updateCustomer = customerService.retrieveCustomerById(Integer.parseInt(id));
+        BaseResponse<Customer> response = new BaseResponse<>();
+        response.setPayload(updateCustomer);
+
+        if (updateCustomer == null) {
+            response.setErrorMessage("Failed to update customer.");
+            response.setErrorCode("902");
+        } else {
+            updateCustomer.setPassword(password.get("password"));
+            Customer result = customerService.updateCustomer(updateCustomer);
+            response.setPayload(result);
+            response.setErrorCode("000");
+            response.setErrorMessage("Success");
+        }
+
+        return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
 }
